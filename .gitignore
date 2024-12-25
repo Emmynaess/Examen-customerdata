@@ -173,3 +173,6 @@ cython_debug/
 secrets
 server_and_database_name.py
 config.py
+customer_data_test.xlsx
+customer_data_test2.xlsx
+data_to_excel2

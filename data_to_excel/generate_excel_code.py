@@ -1,5 +1,3 @@
-# This code generates customer who buys more than one product
-
 import pandas as pd
 from faker import Faker
 import random
@@ -9,8 +7,10 @@ from config import AZURE_MAPS_API_KEY
 import time
 import logging
 import unicodedata
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
+import math
+from largest_cities import largest_cities
 
 fake = Faker("sv_SE")
 logging.basicConfig(level=logging.INFO)
@@ -25,8 +25,20 @@ def load_products_from_csv(filename):
         return []
 
 def generate_coordinates():
-    lat = random.uniform(58.0, 63.0)
-    lon = random.uniform(14.0, 20.0)
+    cities = largest_cities() 
+    city = random.choice(cities)  
+
+    max_radius_km = 50  
+    max_radius_deg = max_radius_km * 0.009  
+
+    angle = random.uniform(0, 2 * math.pi)
+    radius = random.uniform(0, max_radius_deg)
+
+    lat_offset = radius * math.cos(angle)
+    lon_offset = radius * math.sin(angle)
+    lat = city["latitude"] + lat_offset
+    lon = city["longitude"] + lon_offset
+
     return lat, lon
 
 def get_address_from_coordinates(lat, lon, api_key):
@@ -71,15 +83,22 @@ def generate_swedish_phone_number():
     third_part = random.randint(10, 99)
     return f"+46 {area_code}-{first_part} {second_part} {third_part}"
 
-def generate_valid_purchase_date():
+def generate_valid_purchase_date(base_date=None):
     today = datetime.today().date()
-    while True:
-        purchase_date = fake.date_between(start_date='-1y', end_date=today)
-        if purchase_date <= today:
-            return purchase_date.strftime('%Y-%m-%d')
+    if base_date is None:
+        base_date = fake.date_between(start_date='-1y', end_date=today)
+    
+    
+    time_offset = timedelta(days=random.randint(0, 2), hours=random.randint(0, 23))
+    adjusted_date = datetime.combine(base_date, datetime.min.time()) + time_offset
+    
+    
+    if adjusted_date.date() > today:
+        adjusted_date = adjusted_date - timedelta(days=1)
+    
+    return adjusted_date.strftime('%Y-%m-%d')
 
-
-def generate_data(rows=10, max_retries=10):
+def generate_data(rows=500, max_retries=10):
     domains = ["hotmail.com", "gmail.com", "outlook.com", "live.com", "icloud.com"]
     products = load_products_from_csv("products.csv")
 
@@ -101,9 +120,11 @@ def generate_data(rows=10, max_retries=10):
         else:
             street, postcode, city, municipality = "Fallback Street", "Fallback Postcode", "Fallback City", "Fallback Municipality"
 
-        purchase_count = random.randint(1, 5)
+        purchase_count = random.randint(1, 2)  # Antal köp per person
+        base_date = fake.date_between(start_date='-1y', end_date=datetime.today().date())  # Gemensamt grunddatum
+
         for _ in range(purchase_count):
-            purchase_date = generate_valid_purchase_date()
+            purchase_date = generate_valid_purchase_date(base_date)
             product = random.choice(products) 
             quantity = random.randint(1, 5)
             total_amount = product["price"] * quantity 
@@ -174,9 +195,9 @@ def introduce_realistic_errors(df, error_probability=0.05):
 
     return df
 
-def generate_and_corrupt_data(rows=10):
+def generate_and_corrupt_data(rows=500):
     df = generate_data(rows)
-    df_with_errors = introduce_realistic_errors(df, error_probability=0.05)
+    df_with_errors = introduce_realistic_errors(df, error_probability=0.10)
     return df_with_errors
 
 def save_to_excel(df, filename):
@@ -190,5 +211,6 @@ def save_to_excel(df, filename):
     df.to_excel(filename, index=False)
     print(f"Excel file '{filename}' has been created.")
 
-customer_data = generate_and_corrupt_data(10)
-save_to_excel(customer_data, "customer_data.xlsx")
+customer_data = generate_and_corrupt_data(500)
+save_to_excel(customer_data, "customer_data_test.xlsx")
+
