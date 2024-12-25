@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: write  
 
 jobs:
   split_data:
@@ -26,8 +26,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # === HÄR KÖRS scriptet som både VALIDERAR och DEDUPLICERAR ===
-      # (d.v.s. nya versionen av split_data.py)
+      # Här körs scriptet som BÅDE validerar och deduplicerar
+      # (d.v.s. nya split_data.py som även gör "drop_duplicates")
       - name: Run split_data.py
         run: |
           python pipeline_scripts/split_data.py
@@ -39,17 +39,16 @@ jobs:
             exit 1;
           fi
 
-      - name: Commit splitted files
+      - name: Commit valid/invalid files
         run: |
           git config user.name "GitHub Actions"
           git config user.email "[email protected]"
-
-          # Se till att lokal klon är i fas innan commit
           git fetch origin
           git rebase origin/main
 
+          # Nu är "customer_data_valid.xlsx" redan deduplicerad
           git add customer_data_valid/customer_data_valid.xlsx customer_data_invalid/customer_data_invalid.xlsx
-          git commit -m "Update splitted (and deduplicated) data [skip ci]" || echo "No changes to commit"
+          git commit -m "Update splitted (deduplicated) data [skip ci]" || echo "No changes to commit"
           git push origin HEAD:main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -103,14 +102,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Verify deduplicated file exists
+      # OBS! Byt namn på detta steg från "Verify deduplicated file exists"
+      # till något som bättre beskriver filen nu (t.ex. "Verify valid data file").
+      - name: Verify valid data file exists
         run: |
           if [ ! -f "customer_data_valid/customer_data_valid.xlsx" ]; then
-            echo "Deduplicated file (customer_data_valid) is missing!";
-            exit 1;
+            echo "Valid data file (customer_data_valid.xlsx) is missing in upload_data job!"
+            exit 1
           fi
 
-      - name: Upload deduplicated data to Azure SQL
+      - name: Upload valid data to Azure SQL
         env:
           AZURE_SQL_SERVER: ${{ secrets.AZURE_SQL_SERVER }}
           AZURE_SQL_DATABASE: ${{ secrets.AZURE_SQL_DATABASE }}
