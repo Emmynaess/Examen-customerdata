@@ -88,6 +88,10 @@ jobs:
           fetch-depth: 0
           clean: true
 
+      - name: Debug - List repository files
+        run: |
+          ls -R
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -101,8 +105,8 @@ jobs:
       - name: Verify valid data file exists
         run: |
           if [ ! -f "customer_data_valid/customer_data_valid.xlsx" ]; then
-            echo "Valid data file (customer_data_valid.xlsx) is missing in upload_data job!"
-            exit 1
+            echo "Valid data file (customer_data_valid.xlsx) is missing in upload_data job!";
+            exit 1;
           fi
 
       - name: Upload valid data to Azure SQL
@@ -113,3 +117,4 @@ jobs:
           AZURE_SQL_PASSWORD: ${{ secrets.AZURE_SQL_PASSWORD }}
         run: |
           python pipeline_scripts/upload_to_sql.py
+
