@@ -39,7 +39,7 @@ def deduplicate_purchases(input_file: str, output_folder: str) -> None:
 if __name__ == "__main__":
     deduplicate_purchases(
         input_file="customer_data_valid/customer_data_valid.xlsx",
-        output_folder="customer_deduplicated_data/customer_deduplicated_data.xlsx"
+        output_folder="customer_deduplicated_data"
     )
 
 
