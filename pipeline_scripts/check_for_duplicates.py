@@ -2,14 +2,11 @@ import os
 import pandas as pd
 
 def format_swedish_phone_number(phone) -> str:
-    # Konvertera telefonnumret till en sträng om det inte redan är det
     phone = str(phone)
 
-    # Kontrollera att det börjar med '+', om inte, lägg till '+'
     if not phone.startswith("+"):
         phone = "+" + phone
 
-    # Ersätt kommatecken och andra oönskade tecken
     phone = phone.replace(",", "-").replace(" ", "-").strip()
 
     return phone
@@ -23,7 +20,7 @@ def deduplicate_purchases(input_file: str, output_folder: str) -> None:
     unique_key = ["First Name", "Last Name", "Email", "Phone", "Purchase Date", "ProductID"]
     missing_columns = [col for col in unique_key if col not in df.columns]
     if missing_columns:
-        raise KeyError(f"Följande kolumner saknas i DataFrame: {missing_columns}")
+        raise KeyError(f"Missing columns in dataframe {missing_columns}")
 
     before = len(df)
     df = df.drop_duplicates(subset=unique_key, keep="first")
@@ -33,12 +30,11 @@ def deduplicate_purchases(input_file: str, output_folder: str) -> None:
     print(f"Antal rader efter dubblett-rensning: {after}")
     print(f"Antal borttagna dubblettrader: {before - after}")
 
-    # Konvertera alla telefonnummer till strängar och formatera
     df["Phone"] = df["Phone"].astype(str).apply(format_swedish_phone_number)
 
-    output_file = os.path.join(output_folder, "customer_data_deduped.xlsx")
+    output_file = os.path.join(output_folder, "customer_deduplicated_data.xlsx")
     df.to_excel(output_file, index=False)
-    print(f"Deduplicerad data sparad i: {output_file}")
+    print(f"Deduplicated data saved in i: {output_file}")
 
 if __name__ == "__main__":
     deduplicate_purchases(
