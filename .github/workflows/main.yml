@@ -26,8 +26,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Här körs scriptet som BÅDE validerar och deduplicerar
-      # (d.v.s. nya split_data.py som även gör "drop_duplicates")
       - name: Run split_data.py
         run: |
           python pipeline_scripts/split_data.py
@@ -45,8 +43,6 @@ jobs:
           git config user.email "[email protected]"
           git fetch origin
           git rebase origin/main
-
-          # Nu är "customer_data_valid.xlsx" redan deduplicerad
           git add customer_data_valid/customer_data_valid.xlsx customer_data_invalid/customer_data_invalid.xlsx
           git commit -m "Update splitted (deduplicated) data [skip ci]" || echo "No changes to commit"
           git push origin HEAD:main
@@ -102,8 +98,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # OBS! Byt namn på detta steg från "Verify deduplicated file exists"
-      # till något som bättre beskriver filen nu (t.ex. "Verify valid data file").
       - name: Verify valid data file exists
         run: |
           if [ ! -f "customer_data_valid/customer_data_valid.xlsx" ]; then
