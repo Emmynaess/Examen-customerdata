@@ -14,6 +14,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          clean: true
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -40,6 +41,11 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "[email protected]"
+
+          # Se till att lokal klon är i fas:
+          git fetch origin
+          git rebase origin/main
+
           git add customer_data_valid/customer_data_valid.xlsx customer_data_invalid/customer_data_invalid.xlsx
           git commit -m "Update splitted data [skip ci]" || echo "No changes to commit"
           git push origin HEAD:main
@@ -54,7 +60,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          clean: true
+          clean: true  # Rensar bort ocommittade filer, så inget "untracked" krockar
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -81,6 +87,12 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "[email protected]"
+
+          # Hämta ev nya commits i remote
+          git fetch origin
+          git rebase origin/main
+
+          # Lägg till den nu deduplicerade filen
           git add customer_data_valid/customer_data_valid.xlsx
           git commit -m "Update deduplicated data [skip ci]" || echo "No changes to commit"
           git push origin HEAD:main
@@ -95,6 +107,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          clean: true
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -123,18 +136,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
-      - name: Force fetch and reset repository
-        run: |
-          git fetch --all
-          git reset --hard origin/main
-
-      - name: Verify deduplicated file exists
-        run: |
-          if [ ! -f "customer_data_valid/customer_data_valid.xlsx" ]; then
-            echo "Deduplicated file is missing in upload_data job!";
-            exit 1;
-          fi
+          clean: true
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -146,6 +148,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Verify deduplicated file exists
+        run: |
+          if [ ! -f "customer_data_valid/customer_data_valid.xlsx" ]; then
+            echo "Deduplicated file is missing in upload_data job!";
+            exit 1;
+          fi
+
       - name: Upload deduplicated data to Azure SQL
         env:
           AZURE_SQL_SERVER: ${{ secrets.AZURE_SQL_SERVER }}
@@ -154,4 +163,3 @@ jobs:
           AZURE_SQL_PASSWORD: ${{ secrets.AZURE_SQL_PASSWORD }}
         run: |
           python pipeline_scripts/upload_to_sql.py
-
