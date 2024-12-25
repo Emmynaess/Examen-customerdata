@@ -3,7 +3,7 @@ import pandas as pd
 import pyodbc
 
 def upload_to_azure():
-    file_path = "customer_data_valid/customer_data_valid.xlsx"
+    file_path = "customer_data_valid/customer_data_valid.xlsx" 
     df = pd.read_excel(file_path)
 
     server = os.environ["AZURE_SQL_SERVER"]

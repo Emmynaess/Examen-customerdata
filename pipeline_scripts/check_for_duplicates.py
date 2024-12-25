@@ -16,7 +16,7 @@ def deduplicate_purchases(input_file: str) -> None:
     unique_key = ["First Name", "Last Name", "Email", "Phone", "Purchase Date", "ProductID"]
     missing_columns = [col for col in unique_key if col not in df.columns]
     if missing_columns:
-        raise KeyError(f"Missing columns in dataframe {missing_columns}")
+        raise KeyError(f"Missing columns in dataframe: {missing_columns}")
 
     before = len(df)
     df = df.drop_duplicates(subset=unique_key, keep="first")
@@ -28,12 +28,13 @@ def deduplicate_purchases(input_file: str) -> None:
 
     df["Phone"] = df["Phone"].astype(str).apply(format_swedish_phone_number)
 
-    # ÖVERSKRIV den befintliga filen
+    # Överskriv befintliga filen
     df.to_excel(input_file, index=False)
     print(f"Deduplicated data saved to: {input_file}")
 
 if __name__ == "__main__":
     deduplicate_purchases("customer_data_valid/customer_data_valid.xlsx")
+
 
 
 
