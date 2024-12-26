@@ -40,8 +40,7 @@ def upload_to_azure():
                     INSERT INTO Customer (FirstName, LastName, Birthdate, CustomerCategory)
                     VALUES (?, ?, ?, ?)
                 END
-            """, row['First Name'], row['Last Name'], row['Birthdate'], 
-                  row['First Name'], row['Last Name'], row['Birthdate'], row['Customer Category'])
+            """, row['First Name'], row['Last Name'], row['Birthdate'], row['Customer Category'])
 
             # Retrieve CustomerID
             cursor.execute("""
@@ -60,8 +59,7 @@ def upload_to_azure():
                     INSERT INTO CustomerAddress (CustomerID, StreetName, Postalcode, City, Municipality)
                     VALUES (?, ?, ?, ?, ?)
                 END
-            """, customer_id, row['Streetname'], row['Postcode'], row['City'], row['Municipality'],
-                  customer_id, row['Streetname'], row['Postcode'], row['City'], row['Municipality'])
+            """, customer_id, row['Streetname'], row['Postcode'], row['City'], row['Municipality'])
 
             # Insert into CustomerContactInformation
             cursor.execute("""
@@ -73,8 +71,7 @@ def upload_to_azure():
                     INSERT INTO CustomerContactInformation (CustomerID, Phone, Email)
                     VALUES (?, ?, ?)
                 END
-            """, customer_id, row['Phone'], row['Email'],
-                  customer_id, row['Phone'], row['Email'])
+            """, customer_id, row['Phone'], row['Email'])
 
             # Insert into Purchase
             cursor.execute("""
