@@ -176,5 +176,5 @@ config.py
 customer_data_test.xlsx
 customer_data_test2.xlsx
 data_to_excel2
-text.txt
-NOT_YOU_check_for_duplicates.py
+pipeline_scripts2
+yml_code_workflow

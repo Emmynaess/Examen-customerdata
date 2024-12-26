@@ -98,7 +98,7 @@ def generate_valid_purchase_date(base_date=None):
     
     return adjusted_date.strftime('%Y-%m-%d')
 
-def generate_data(rows=500, max_retries=10):
+def generate_data(rows=10, max_retries=10):
     domains = ["hotmail.com", "gmail.com", "outlook.com", "live.com", "icloud.com"]
     products = load_products_from_csv("products.csv")
 
@@ -195,9 +195,9 @@ def introduce_realistic_errors(df, error_probability=0.05):
 
     return df
 
-def generate_and_corrupt_data(rows=500):
+def generate_and_corrupt_data(rows=10):
     df = generate_data(rows)
-    df_with_errors = introduce_realistic_errors(df, error_probability=0.10)
+    df_with_errors = introduce_realistic_errors(df, error_probability=0.05)
     return df_with_errors
 
 def save_to_excel(df, filename):
@@ -211,6 +211,5 @@ def save_to_excel(df, filename):
     df.to_excel(filename, index=False)
     print(f"Excel file '{filename}' has been created.")
 
-customer_data = generate_and_corrupt_data(500)
-save_to_excel(customer_data, "customer_data_test.xlsx")
-
+customer_data = generate_and_corrupt_data(10)
+save_to_excel(customer_data, "customer_data1.xlsx")

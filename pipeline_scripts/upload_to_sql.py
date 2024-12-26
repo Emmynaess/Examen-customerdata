@@ -6,6 +6,12 @@ def upload_to_azure():
     file_path = "customer_data_valid/customer_data_valid.xlsx" 
     df = pd.read_excel(file_path)
 
+    for col in ['First Name', 'Last Name', 'Birthdate', 'ProductID']:
+        print(f"column {col} - nulls: {df[col].isnull().sum()}")
+
+    df['Birthdate'] = pd.to_datetime(df['Birthdate']).dt.strftime('%Y-%m-%d')
+    df['Purchase Date'] = pd.to_datetime(df['Purchase Date']).dt.strftime('%Y-%m-%d')
+
     server = os.environ["AZURE_SQL_SERVER"]
     database = os.environ["AZURE_SQL_DATABASE"]
     user = os.environ["AZURE_SQL_USER"]
@@ -24,7 +30,6 @@ def upload_to_azure():
 
     for index, row in df.iterrows():
         try:
-          
             cursor.execute("""
                 IF NOT EXISTS (
                     SELECT 1 FROM Customer
@@ -36,14 +41,13 @@ def upload_to_azure():
                 END
             """, row['First Name'], row['Last Name'], row['Birthdate'], row['First Name'], row['Last Name'], row['Birthdate'], row['Customer Category'])
 
-         
             cursor.execute("""
                 SELECT CustomerID FROM Customer
                 WHERE FirstName = ? AND LastName = ? AND Birthdate = ?
             """, row['First Name'], row['Last Name'], row['Birthdate'])
             customer_id = cursor.fetchone()[0]
+            print(f"Rad {index} - CustomerID: {customer_id}, Data: {row.to_dict()}")
 
-            
             cursor.execute("""
                 IF NOT EXISTS (
                     SELECT 1 FROM CustomerAddress
@@ -56,7 +60,6 @@ def upload_to_azure():
             """, customer_id, row['Streetname'], row['Postcode'], row['City'], row['Municipality'],
                 customer_id, row['Streetname'], row['Postcode'], row['City'], row['Municipality'])
 
-            
             cursor.execute("""
                 IF NOT EXISTS (
                     SELECT 1 FROM CustomerContactInformation
@@ -69,7 +72,6 @@ def upload_to_azure():
             """, customer_id, row['Phone'], row['Email'],
                 customer_id, row['Phone'], row['Email'])
 
-            
             cursor.execute("""
                 IF NOT EXISTS (
                     SELECT 1 FROM Purchase
@@ -79,10 +81,10 @@ def upload_to_azure():
                     INSERT INTO Purchase (CustomerID, ProductID, PurchaseDate, Quantity, TotalAmount)
                     VALUES (?, ?, ?, ?, ?)
                 END
-            """, customer_id, row['ProductID'], row['Purchase Date'], customer_id, row['ProductID'], row['Purchase Date'], row['Quantity'], row['Total Amount'])
+            """, customer_id, row['ProductID'], row['Purchase Date'], row['Quantity'], row['Total Amount'])
 
         except Exception as e:
-            print(f"Fel på rad {index}: {e}")
+            print(f"Fel på rad {index}: {e}, Data: {row.to_dict()}")
             continue
 
     conn.commit()
