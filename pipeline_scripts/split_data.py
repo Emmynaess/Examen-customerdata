@@ -27,8 +27,9 @@ def main():
         df["City"].isin(["No City", "Fallback City"]) |
         df["Municipality"].isin(["No Municipality", "Fallback Municipality"]) |
         df["Purchase Date"].str.contains(r'[^\d-]', na=False) | 
-        ~df["Purchase Date"].str.match(r'^\d{4}-\d{2}-\d{2}$', na=False) 
-    )
+        ~df["Purchase Date"].str.match(r'^\d{4}-\d{2}-\d{2}$', na=False) | 
+        ~df["Birthdate"].str.match(r'^\d{4}-\d{2}-\d{2}$', na=False)  
+        )
 
     df_invalid = df[invalid_conditions].copy()
     df_valid = df[~invalid_conditions].copy()
