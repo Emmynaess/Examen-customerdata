@@ -27,14 +27,16 @@ def upload_to_azure():
             # Insert into Customer
             cursor.execute("""
                 IF NOT EXISTS (
-                    SELECT 1 FROM Customer
+                    SELECT 1 FROM dbo.Customer
                     WHERE FirstName = ? AND LastName = ? AND Birthdate = ?
                 )
                 BEGIN
-                    INSERT INTO Customer (FirstName, LastName, Birthdate, CustomerCategory)
+                    INSERT INTO dbo.Customer (FirstName, LastName, Birthdate, CustomerCategory)
                     VALUES (?, ?, ?, ?)
                 END
-            """, row['First Name'], row['Last Name'], row['Birthdate'], row['Customer Category'])
+            """, 
+            row['First Name'], row['Last Name'], row['Birthdate'],  # För SELECT
+            row['First Name'], row['Last Name'], row['Birthdate'], row['Customer Category'])  # För INSERT
 
             # Retrieve CustomerID
             cursor.execute("""
@@ -46,38 +48,44 @@ def upload_to_azure():
             # Insert into CustomerAddress
             cursor.execute("""
                 IF NOT EXISTS (
-                    SELECT 1 FROM CustomerAddress
+                    SELECT 1 FROM dbo.CustomerAddress
                     WHERE CustomerID = ? AND StreetName = ? AND Postalcode = ? AND City = ? AND Municipality = ?
                 )
                 BEGIN
-                    INSERT INTO CustomerAddress (CustomerID, StreetName, Postalcode, City, Municipality)
+                    INSERT INTO dbo.CustomerAddress (CustomerID, StreetName, Postalcode, City, Municipality)
                     VALUES (?, ?, ?, ?, ?)
                 END
-            """, customer_id, row['Streetname'], row['Postcode'], row['City'], row['Municipality'])
+            """, 
+            customer_id, row['Streetname'], row['Postcode'], row['City'], row['Municipality'],  # För SELECT
+            customer_id, row['Streetname'], row['Postcode'], row['City'], row['Municipality'])  # För INSERT
 
             # Insert into CustomerContactInformation
             cursor.execute("""
                 IF NOT EXISTS (
-                    SELECT 1 FROM CustomerContactInformation
+                    SELECT 1 FROM dbo.CustomerContactInformation
                     WHERE CustomerID = ? AND Phone = ? AND Email = ?
                 )
                 BEGIN
-                    INSERT INTO CustomerContactInformation (CustomerID, Phone, Email)
+                    INSERT INTO dbo.CustomerContactInformation (CustomerID, Phone, Email)
                     VALUES (?, ?, ?)
                 END
-            """, customer_id, row['Phone'], row['Email'])
+            """, 
+            customer_id, row['Phone'], row['Email'],  # För SELECT
+            customer_id, row['Phone'], row['Email'])  # För INSERT
 
             # Insert into Purchase
             cursor.execute("""
                 IF NOT EXISTS (
-                    SELECT 1 FROM Purchase
+                    SELECT 1 FROM dbo.Purchase
                     WHERE CustomerID = ? AND ProductID = ? AND PurchaseDate = ?
                 )
                 BEGIN
-                    INSERT INTO Purchase (CustomerID, ProductID, PurchaseDate, Quantity, TotalAmount)
+                    INSERT INTO dbo.Purchase (CustomerID, ProductID, PurchaseDate, Quantity, TotalAmount)
                     VALUES (?, ?, ?, ?, ?)
                 END
-            """, customer_id, row['ProductID'], row['Purchase Date'], row['Quantity'], row['Total Amount'])
+            """, 
+            customer_id, row['ProductID'], row['Purchase Date'],  # För SELECT
+            customer_id, row['ProductID'], row['Purchase Date'], row['Quantity'], row['Total Amount'])  # För INSERT
 
             print(f"Row {index} processed successfully.")
 
@@ -91,4 +99,4 @@ def upload_to_azure():
     print(f"Data from {file_path} has been uploaded to the SQL database.")
 
 if __name__ == "__main__":
-    upload_to_azure()
+        upload_to_azure()
