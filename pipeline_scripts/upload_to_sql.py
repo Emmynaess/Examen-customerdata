@@ -6,12 +6,6 @@ def upload_to_azure():
     file_path = "customer_data_valid/customer_data_valid.xlsx" 
     df = pd.read_excel(file_path)
 
-    for col in ['First Name', 'Last Name', 'Birthdate', 'ProductID']:
-        print(f"column {col} - nulls: {df[col].isnull().sum()}")
-
-    df['Birthdate'] = pd.to_datetime(df['Birthdate']).dt.strftime('%Y-%m-%d')
-    df['Purchase Date'] = pd.to_datetime(df['Purchase Date']).dt.strftime('%Y-%m-%d')
-
     server = os.environ["AZURE_SQL_SERVER"]
     database = os.environ["AZURE_SQL_DATABASE"]
     user = os.environ["AZURE_SQL_USER"]
