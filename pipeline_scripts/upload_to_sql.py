@@ -24,6 +24,7 @@ def upload_to_azure():
 
     for index, row in df.iterrows():
         try:
+            
             # Insert into Customer
             cursor.execute("""
                 IF NOT EXISTS (
