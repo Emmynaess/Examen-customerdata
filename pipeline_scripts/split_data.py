@@ -46,10 +46,10 @@ def main():
 
     df_invalid = pd.concat([df_invalid, df_duplicates], ignore_index=True)
 
-    print(f"Total rows in the original data: {len(df)}")
-    print(f"Invalid rows (including duplicates): {len(df_invalid)}")
-    print(f"Rows in valid data (after removing duplicates): {len(df_valid)}")
-    print(f"Number of duplicate rows moved to invalid: {len(df_duplicates)}")
+    #print(f"Total rows in the original data: {len(df)}")
+    #print(f"Invalid rows (including duplicates): {len(df_invalid)}")
+    #print(f"Rows in valid data (after removing duplicates): {len(df_valid)}")
+    #print(f"Number of duplicate rows moved to invalid: {len(df_duplicates)}")
 
     os.makedirs("customer_data_valid", exist_ok=True)
     os.makedirs("customer_data_invalid", exist_ok=True)
@@ -63,9 +63,9 @@ def main():
     with pd.ExcelWriter("customer_data_invalid/customer_data_invalid.xlsx", engine="openpyxl") as writer:
         df_invalid.to_excel(writer, index=False)
 
-    print("The following files were created:")
-    print("  - customer_data_valid/customer_data_valid.xlsx (validated + deduplicated)")
-    print("  - customer_data_invalid/customer_data_invalid.xlsx (invalid + duplicates)")
+    #print("The following files were created:")
+    #print("  - customer_data_valid/customer_data_valid.xlsx (validated + deduplicated)")
+    #print("  - customer_data_invalid/customer_data_invalid.xlsx (invalid + duplicates)")
 
 if __name__ == "__main__":
     main()
