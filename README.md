@@ -8,7 +8,7 @@ This project automates the generation, validation, and upload of customer data t
 ## **Preparation**
 
 ### **1. Install the Project**
-1. Create a virtual environment:
+1. Create a virtual environment in VS Code:
    ```bash
    python -m venv .venv
    ```
@@ -29,24 +29,33 @@ This project automates the generation, validation, and upload of customer data t
 ### **2. Configure Azure Maps**
 1. Log in to Azure and create an Azure Maps account.
 2. Navigate to your Azure Maps key and copy your **Primary Key**.
-3. Create a file in the same folder as `generate_excel_code.py` called `config.py` and fill it with the following code:
+3. Create a file in the same folder (data_to_excel) as your scripts called `config.py` and fill it with the following code:
    ```python
    AZURE_MAPS_API_KEY = "your_azure_maps_key"
    ```
    Note: This file should never be uploaded to GitHub. Make sure to add it to `.gitignore`.
 
-### **3. Generate Customer Data**
-1. Navigate to the folder containing `generate_excel_code.py`:
-   ```bash
-   cd data_to_excel
+### **3. Modify Row Count (Optional)**
+If you need to change the number of rows generated, modify the following lines in the respective scripts:
+1. **`data_generator.py`**:
+   ```python
+   def generate_data(rows=10, max_retries=10):
+   def generate_and_corrupt_data(rows=10):
    ```
-2. Run the script to create the `customer_data.xlsx` file:
-   ```bash
-   python generate_excel_code.py
+2. **`main.py`**:
+   ```python
+   customer_data = generate_and_corrupt_data(10)
    ```
-   Note: This script uses the Azure Maps API to generate addresses. Ensure `config.py` is correctly configured.
+Replace `10` with the desired number of rows.
 
-### **4. Create an Azure SQL Database**
+### **4. Generate Customer Data**
+1. Run the main script:
+   ```bash
+   python main.py
+   ```
+   This will create a file named `customer_data.xlsx` containing the generated customer data.
+
+### **5. Create an Azure SQL Database**
 1. Log in to Azure and create:
    - An SQL server.
    - An SQL database linked to the server.
@@ -56,7 +65,7 @@ This project automates the generation, validation, and upload of customer data t
    - Username
    - Password
 
-### **5. Create Tables and Populate Products**
+### **6. Create Tables and Populate Products**
 1. Open SQL Server Management Studio (SSMS).
 2. Connect to your Azure SQL database.
 3. Run the following SQL script to create tables and populate products:
@@ -65,7 +74,7 @@ This project automates the generation, validation, and upload of customer data t
    -- Copy the code from the file and run it here
    ```
 
-### **6. Configure GitHub Secrets**
+### **7. Configure GitHub Secrets**
 1. Go to your GitHub repository.
 2. Add the following secrets under **Settings -> Secrets and variables -> Actions**:
    - `AZURE_SQL_SERVER`: Your Azure SQL server name.
@@ -74,7 +83,7 @@ This project automates the generation, validation, and upload of customer data t
    - `AZURE_SQL_PASSWORD`: Your database password.
    - `AZURE_MAPS_API_KEY`: Your Azure Maps key.
 
-### **7. Run the Pipeline**
+### **8. Run the Pipeline**
 #### Manually
 1. Go to your GitHub repository.
 2. Run the workflow manually by navigating to the **Actions** tab, selecting the workflow, and clicking **Run workflow**.

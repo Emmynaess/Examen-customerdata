@@ -120,8 +120,8 @@ def generate_data(rows=10, max_retries=10):
         else:
             street, postcode, city, municipality = "Fallback Street", "Fallback Postcode", "Fallback City", "Fallback Municipality"
 
-        purchase_count = random.randint(1, 2)  # Antal köp per person
-        base_date = fake.date_between(start_date='-1y', end_date=datetime.today().date())  # Gemensamt grunddatum
+        purchase_count = random.randint(1, 2)
+        base_date = fake.date_between(start_date='-1y', end_date=datetime.today().date())
 
         for _ in range(purchase_count):
             purchase_date = generate_valid_purchase_date(base_date)
